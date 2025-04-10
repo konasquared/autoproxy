@@ -9,8 +9,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 dotenv.load_dotenv()
 
-from proxygenerator import *
-from proxy import Proxy
+from .proxygenerator import *
+from .proxy import Proxy
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class AutoProxy():
     def __init__(self):
         self.proxies = []
         self.current_idx = 0
-        self.proxy_generator = SpysOneSocksProxyGen()
+        self.proxy_generator = GeonodeSocksProxyGen()
 
     def get_proxy(self):
         if not self.proxies:

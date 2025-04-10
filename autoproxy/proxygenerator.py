@@ -2,7 +2,7 @@ import requests
 import re
 import os
 import dotenv
-from proxy import Proxy
+from .proxy import Proxy
 
 
 class ProxyGenerator:
@@ -12,16 +12,29 @@ class ProxyGenerator:
     def get_proxies(self):
         pass
 
-class GeonodeProxyGen(ProxyGenerator):
+class GeonodeHTTPProxyGen(ProxyGenerator):
     def __init__(self):
         self.unchecked_proxies = []
 
-    def get_proxies(self):
-        url = "https://proxylist.geonode.com/api/proxy-list?protocols=https%2Chttp&limit=100&page=1&sort_by=lastChecked&sort_type=desc"
+    def get_proxies(self, proxy_count=100):
+        url = f"https://proxylist.geonode.com/api/proxy-list?protocols=https%2Chttp&limit={proxy_count}&page=1&sort_by=lastChecked&sort_type=desc"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
             self.unchecked_proxies = [Proxy(item['protocols'][0], item['ip'], item['port']) for item in data['data']]
+        else:
+            raise ValueError("Failed to fetch proxies")
+
+class GeonodeSocksProxyGen(ProxyGenerator):
+    def __init__(self):
+        self.unchecked_proxies = []
+
+    def get_proxies(self, proxy_count=100):
+        url = f"https://proxylist.geonode.com/api/proxy-list?protocols=socks5%2Csocks4&limit={proxy_count}&page=1&sort_by=lastChecked&sort_type=desc"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            self.unchecked_proxies = [Proxy(item['protocols'][0], item['ip'], item['port'], is_socks_proxy=True) for item in data['data']]
         else:
             raise ValueError("Failed to fetch proxies")
 
@@ -31,16 +44,6 @@ class SpysOneHTTPProxyGen(ProxyGenerator):
 
     def get_proxies(self):
         url = "https://spys.me/proxy.txt"
-
-        fetch_number = '2' # 0: 30, 1: 50, 2: 100, 3: 200, 4: 300, 5: 500
-        anonymity = '0' # 0: all, 1: anon+elite, 2: non-anon, 3: anon, 4: elite
-        ssl = '0' # 0: all, 1: ssl, 2: no-ssl
-        port = '0' # 0: all, 1: 3128, 2: 8080, 3: 80
-        type = '1' # 0: all, 1: http, 2: socks
-
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0'
-        }
 
         response = requests.get(url)
 
@@ -85,6 +88,7 @@ class SpysOneSocksProxyGen(ProxyGenerator):
         url = "https://spys.me/socks.txt"
 
         response = requests.get(url)
+        print(response.text)
 
         if response.status_code == 200:
             raw = response.text

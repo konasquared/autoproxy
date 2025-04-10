@@ -2,7 +2,7 @@ import autoproxy
 import requests
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 proxies = autoproxy.AutoProxy()
 proxies.load_proxies()

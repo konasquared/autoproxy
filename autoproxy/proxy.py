@@ -11,8 +11,8 @@ class Proxy():
     def to_requests_like(self):
         if self.is_socks_proxy:
             return {
-                'http': f"socks5://{self.ip}:{self.port}",
-                'https': f"socks5://{self.ip}:{self.port}"
+                'http': f"{self.protocol}://{self.ip}:{self.port}",
+                'https': f"{self.protocol}://{self.ip}:{self.port}"
             }
         else:
             obj = {
@@ -26,7 +26,7 @@ class Proxy():
     
     def check(self):
         try:
-            response = requests.get(f"https://httpbin.org/ip", proxies=self.to_requests_like(), timeout=2)
+            response = requests.get(f"https://httpbin.org/ip", proxies=self.to_requests_like(), timeout=10)
             if response.status_code == 200:
                 return True
         except requests.RequestException as e:
