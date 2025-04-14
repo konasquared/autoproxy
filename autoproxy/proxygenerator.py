@@ -124,7 +124,28 @@ class SpysOneSocksProxyGen(ProxyGenerator):
             self.unchecked_proxies.append(proxy)
         return self.unchecked_proxies
 
+class TextFileProxyGen(ProxyGenerator):
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.unchecked_proxies = []
 
+    def get_proxies(self):
+        with open(self.file_path, 'r') as f:
+            lines = f.readlines()
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(':')
+            if len(parts) != 2:
+                continue
+            addr = parts[0]
+            port = parts[1]
+            protocol = 'http'  # Default to HTTP, can be changed based on your needs
+            proxy = Proxy(protocol, addr, port)
+            self.unchecked_proxies.append(proxy)
+        return self.unchecked_proxies
 
 
     
